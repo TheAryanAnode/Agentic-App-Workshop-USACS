@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+:root {
+  --scarlet: #cc0033;
+  --scarlet-dark: #9d0027;
+  --ink: #191919;
+  --muted: #6b6661;
+  --cream: #f7f3ed;
+  --paper: #fffdf9;
+  --line: #ded8d0;
+  --success: #19734a;
+  --warning: #a45c00;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--cream);
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background:
+    radial-gradient(circle at 5% -10%, rgb(204 0 51 / 10%), transparent 33rem),
+    radial-gradient(circle at 95% 115%, rgb(204 0 51 / 7%), transparent 38rem),
+    var(--cream);
+  color: var(--ink);
+  font-family: var(--font-geist-sans), Arial, sans-serif;
+}
+
+button,
+textarea {
+  font: inherit;
+}
+
+button:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgb(204 0 51 / 25%);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: rgb(204 0 51 / 18%);
+}
+
+.subtle-grid {
+  background-image:
+    linear-gradient(rgb(25 25 25 / 2.5%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(25 25 25 / 2.5%) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.scrollbar-thin {
+  scrollbar-color: #c9c1b8 transparent;
+  scrollbar-width: thin;
+}
+
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.thinking-dot {
+  animation: pulse-soft 1.2s ease-in-out infinite;
+}
+
+.thinking-dot:nth-child(2) {
+  animation-delay: 150ms;
+}
+
+.thinking-dot:nth-child(3) {
+  animation-delay: 300ms;
+}
