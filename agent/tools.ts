@@ -1,9 +1,5 @@
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
-import { findCourse } from "@/data/courses";
-import { searchDining } from "@/data/dining";
-import { searchBuildings } from "@/data/buildings";
-import { searchEvents } from "@/data/events";
 
 // ---------------------------------------------------------------------------
 // WORKING EXAMPLE: every student starts with this tool.
@@ -49,13 +45,14 @@ export const calculator = tool(
 
 export const getCourseInfo = tool(
   async ({ courseCode }) => {
-    const course = findCourse(courseCode);
-    return JSON.stringify(
-      course ?? {
-        kind: "error",
-        message: `No course matched "${courseCode}" in the workshop dataset.`,
-      },
-    );
+    // TODO Checkpoint 4:
+    // 1. Import findCourse from "@/data/courses".
+    // 2. Look up courseCode.
+    // 3. Return the course (or a structured error) with JSON.stringify.
+    return JSON.stringify({
+      kind: "error",
+      message: `TODO: implement getCourseInfo for "${courseCode}".`,
+    });
   },
   {
     name: "getCourseInfo",
@@ -69,12 +66,10 @@ export const getCourseInfo = tool(
 
 export const findDining = tool(
   async ({ query }) => {
-    const matches = searchDining(query);
+    // TODO: import and call searchDining from "@/data/dining".
     return JSON.stringify({
-      kind: "dining",
-      query,
-      matches,
-      note: "Hours are mock workshop data and should be verified before visiting.",
+      kind: "error",
+      message: `TODO: implement findDining for "${query}".`,
     });
   },
   {
@@ -91,8 +86,11 @@ export const findDining = tool(
 
 export const findBuilding = tool(
   async ({ query }) => {
-    const matches = searchBuildings(query);
-    return JSON.stringify({ kind: "building", query, matches });
+    // TODO: import and call searchBuildings from "@/data/buildings".
+    return JSON.stringify({
+      kind: "error",
+      message: `TODO: implement findBuilding for "${query}".`,
+    });
   },
   {
     name: "findBuilding",
@@ -106,12 +104,10 @@ export const findBuilding = tool(
 
 export const findEvents = tool(
   async ({ query }) => {
-    const matches = searchEvents(query);
+    // TODO: import and call searchEvents from "@/data/events".
     return JSON.stringify({
-      kind: "event",
-      query,
-      matches,
-      note: "Events are mock workshop examples, not a live calendar.",
+      kind: "error",
+      message: `TODO: implement findEvents for "${query}".`,
     });
   },
   {
@@ -124,43 +120,12 @@ export const findEvents = tool(
   },
 );
 
-const gradePoints: Record<string, number> = {
-  A: 4,
-  B: 3,
-  "B+": 3.5,
-  C: 2,
-  "C+": 2.5,
-  D: 1,
-  F: 0,
-};
-
 export const calculateGrade = tool(
   async ({ grades }) => {
-    const parsed = grades
-      .split(",")
-      .map((grade) => grade.trim().toUpperCase())
-      .filter(Boolean);
-    const invalid = parsed.filter((grade) => gradePoints[grade] === undefined);
-
-    if (parsed.length === 0 || invalid.length > 0) {
-      return JSON.stringify({
-        kind: "error",
-        message:
-          invalid.length > 0
-            ? `Unsupported grade(s): ${invalid.join(", ")}`
-            : "Provide at least one letter grade.",
-      });
-    }
-
-    const gpa =
-      parsed.reduce((total, grade) => total + gradePoints[grade], 0) /
-      parsed.length;
-
+    // TODO: map Rutgers letter grades to points and average them.
     return JSON.stringify({
-      kind: "grade",
-      grades: parsed,
-      gpa: Number(gpa.toFixed(2)),
-      scale: "Rutgers workshop scale (unweighted courses)",
+      kind: "error",
+      message: `TODO: implement calculateGrade for "${grades}".`,
     });
   },
   {
@@ -175,12 +140,12 @@ export const calculateGrade = tool(
   },
 );
 
-// Add a new tool here, then include it in this array so the agent can use it.
-export const tools = [
-  calculator,
-  getCourseInfo,
-  findDining,
-  findBuilding,
-  findEvents,
-  calculateGrade,
-];
+// ⭐ STUDENTS WORK HERE
+// Add each Rutgers tool to this array after you implement it.
+export const tools = [calculator];
+
+// YOUR TOOL:
+// 1. Define it with tool(...)
+// 2. Give it a clear description and a flat Zod schema
+// 3. Return JSON with a predictable `kind`
+// 4. Register it in the array above
