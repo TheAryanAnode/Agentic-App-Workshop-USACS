@@ -1,58 +1,21 @@
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
+import { findCourse } from "@/data/courses";
 
 // ---------------------------------------------------------------------------
-// WORKING EXAMPLE: every student starts with this tool.
-// ---------------------------------------------------------------------------
-
-export const calculator = tool(
-  async ({ firstNumber, secondNumber, operation }) => {
-    const operations = {
-      add: () => firstNumber + secondNumber,
-      subtract: () => firstNumber - secondNumber,
-      multiply: () => firstNumber * secondNumber,
-      divide: () => {
-        if (secondNumber === 0) throw new Error("Cannot divide by zero.");
-        return firstNumber / secondNumber;
-      },
-    };
-
-    const result = operations[operation]();
-    return JSON.stringify({
-      kind: "calculation",
-      expression: `${firstNumber} ${operation} ${secondNumber}`,
-      result,
-    });
-  },
-  {
-    name: "calculator",
-    description:
-      "Perform arithmetic on two numbers. Use this instead of calculating mentally.",
-    schema: z.object({
-      firstNumber: z.number().describe("The first number"),
-      secondNumber: z.number().describe("The second number"),
-      operation: z
-        .enum(["add", "subtract", "multiply", "divide"])
-        .describe("The arithmetic operation"),
-    }),
-  },
-);
-
-// ---------------------------------------------------------------------------
-// RUTGERS TOOLS: these are complete on the solution branch. On the starter
-// branch, students receive short TODO templates for the same capabilities.
+// WORKING EXAMPLE — already registered. Copy this pattern for later tools.
+// One lookup, one result. This is the easiest kind of campus tool.
 // ---------------------------------------------------------------------------
 
 export const getCourseInfo = tool(
   async ({ courseCode }) => {
-    // TODO Checkpoint 4:
-    // 1. Import findCourse from "@/data/courses".
-    // 2. Look up courseCode.
-    // 3. Return the course (or a structured error) with JSON.stringify.
-    return JSON.stringify({
-      kind: "error",
-      message: `TODO: implement getCourseInfo for "${courseCode}".`,
-    });
+    const course = findCourse(courseCode);
+    return JSON.stringify(
+      course ?? {
+        kind: "error",
+        message: `No course matched "${courseCode}".`,
+      },
+    );
   },
   {
     name: "getCourseInfo",
@@ -64,9 +27,17 @@ export const getCourseInfo = tool(
   },
 );
 
+// ---------------------------------------------------------------------------
+// Add abilities below. Each one is a little harder than the last.
+// Remember: implement the function, then add it to `tools` at the bottom.
+// ---------------------------------------------------------------------------
+
+// Checkpoint 3 — search and return a list
 export const findDining = tool(
   async ({ query }) => {
-    // TODO: import and call searchDining from "@/data/dining".
+    // TODO: import searchDining from "@/data/dining"
+    // Call it with query and return:
+    // JSON.stringify({ kind: "dining", query, matches })
     return JSON.stringify({
       kind: "error",
       message: `TODO: implement findDining for "${query}".`,
@@ -84,9 +55,11 @@ export const findDining = tool(
   },
 );
 
+// Checkpoint 4 — match nicknames like "Hill" or "CORE"
 export const findBuilding = tool(
   async ({ query }) => {
-    // TODO: import and call searchBuildings from "@/data/buildings".
+    // TODO: import searchBuildings from "@/data/buildings"
+    // Return { kind: "building", query, matches }
     return JSON.stringify({
       kind: "error",
       message: `TODO: implement findBuilding for "${query}".`,
@@ -102,9 +75,11 @@ export const findBuilding = tool(
   },
 );
 
+// Checkpoint 5 — filter by topic, campus, org, or course
 export const findEvents = tool(
   async ({ query }) => {
-    // TODO: import and call searchEvents from "@/data/events".
+    // TODO: import searchEvents from "@/data/events"
+    // Return { kind: "event", query, matches }
     return JSON.stringify({
       kind: "error",
       message: `TODO: implement findEvents for "${query}".`,
@@ -120,9 +95,12 @@ export const findEvents = tool(
   },
 );
 
+// Checkpoint 6 — parse input, validate, and compute
 export const calculateGrade = tool(
   async ({ grades }) => {
-    // TODO: map Rutgers letter grades to points and average them.
+    // TODO: split the comma-separated grades, map letter grades to points
+    // (A=4, B+=3.5, B=3, C+=2.5, C=2, D=1, F=0), then return the average.
+    // Return { kind: "grade", grades, gpa, scale }
     return JSON.stringify({
       kind: "error",
       message: `TODO: implement calculateGrade for "${grades}".`,
@@ -140,11 +118,11 @@ export const calculateGrade = tool(
   },
 );
 
-// ⭐ STUDENTS WORK HERE
-// Add each Rutgers tool to this array after you implement it.
-export const tools = [calculator];
+// Register a tool here after you implement it, or the agent cannot call it.
+export const tools = [getCourseInfo];
 
 // YOUR TOOL:
+// Combine ideas, add a new dataset, or solve a request the current tools cannot.
 // 1. Define it with tool(...)
 // 2. Give it a clear description and a flat Zod schema
 // 3. Return JSON with a predictable `kind`

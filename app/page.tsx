@@ -14,7 +14,7 @@ export default function Home() {
                 Rutgers Campus Assistant
               </h1>
               <p className="truncate text-xs text-[var(--muted)] sm:text-sm">
-                A LangGraph workshop agent · mock campus data
+                A LangGraph campus agent for Rutgers–New Brunswick
               </p>
             </div>
           </div>

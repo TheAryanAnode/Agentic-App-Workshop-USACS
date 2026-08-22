@@ -23,11 +23,6 @@ export type ToolResult =
       note?: string;
     }
   | {
-      kind: "calculation";
-      expression: string;
-      result: number;
-    }
-  | {
       kind: "grade";
       grades: string[];
       gpa: number;

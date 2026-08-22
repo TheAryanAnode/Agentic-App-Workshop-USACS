@@ -13,7 +13,7 @@ export const findStudySpotExample = tool(
       kind: "study-spot",
       name: needsQuiet ? "Quiet floor at the campus library" : "Student center lounge",
       campus,
-      note: "Replace this example with a lookup in your own mock dataset.",
+      note: "Replace this example with a lookup in your own dataset.",
     };
 
     return JSON.stringify(result);

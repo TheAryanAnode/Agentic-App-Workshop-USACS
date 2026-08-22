@@ -45,20 +45,6 @@ export function ResultCard({ result }: { result: ToolResult }) {
     );
   }
 
-  if (result.kind === "calculation") {
-    return (
-      <div className="flex items-center justify-between gap-4 rounded-2xl border border-emerald-800/15 bg-emerald-50 p-4">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-wider text-emerald-800">
-            Calculator
-          </p>
-          <p className="mt-1 font-mono text-sm">{result.expression}</p>
-        </div>
-        <p className="text-2xl font-black text-emerald-900">{result.result}</p>
-      </div>
-    );
-  }
-
   if (result.kind === "grade") {
     return (
       <div className="rounded-2xl border border-emerald-800/15 bg-emerald-50 p-4">

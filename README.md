@@ -4,13 +4,13 @@ Build a useful Rutgers Campus Assistant by adding tools to a working LangGraph
 agent. The graph, chat interface, streaming API, tool routing, result cards, and
 activity log are already built. Your job is to give the agent new capabilities.
 
-> This app uses a small **mock Rutgers–New Brunswick dataset** so the workshop
-> remains reliable. It is not an official Rutgers service.
+Each checkpoint adds a harder ability. The agent starts useful (course lookup)
+and gets better as you go.
 
 ## What you will build
 
-By the end, your agent can combine course, dining, building, event, calculator,
-and grade tools to solve a practical student request:
+By the end, your agent can combine course, dining, building, event, and grade
+tools to solve a practical student request:
 
 ```text
 I'm studying for CS112 tomorrow and want food afterward on Busch.
@@ -55,11 +55,18 @@ You need Node.js 20 or newer and a free Gemini API key.
 5. Open [http://localhost:3000](http://localhost:3000) and ask:
 
    ```text
-   What's 42 × 17?
+   What is CS112 and where is it usually taught?
    ```
 
-Watch the **Agent Activity** panel. A chatbot can only generate text; this agent
-decides to call `calculator`, receives `714`, and then writes its answer.
+Watch the **Agent Activity** panel. The agent calls `getCourseInfo`, gets
+structured course data, and the UI renders a course card. Then try:
+
+```text
+Where can I eat on Busch?
+```
+
+Without a dining tool, the agent cannot look that up. That gap is what you
+will close next.
 
 If Gemini's free tier is unavailable, add `GROQ_API_KEY` to `.env.local`; the
 starter automatically uses the fallback model. Never commit `.env.local`.
@@ -85,52 +92,71 @@ START → agent → tools? → agent → END
 When the model returns a normal message, the graph ends. When it returns a tool
 call, `ToolNode` executes that tool and sends its result back to the model.
 
-## 3. Modify the calculator
-
-Open [`agent/tools.ts`](agent/tools.ts). `calculator` is the complete example:
+`getCourseInfo` in [`agent/tools.ts`](agent/tools.ts) is the working example:
 
 - a function performs the work;
 - a description tells the model when to use it;
 - a Zod schema defines valid arguments;
 - the tool returns predictable JSON.
 
-Add an `exponent` operation or improve one error message. Restart only if your
-terminal does not pick up the change, then test the tool in chat.
+## 3. Add dining (search, return a list)
 
-## 4. Build `getCourseInfo`
+Open [`agent/tools.ts`](agent/tools.ts) and implement `findDining`.
 
-Find the `TODO` template in [`agent/tools.ts`](agent/tools.ts).
-
-1. Import `findCourse` from [`data/courses.ts`](data/courses.ts).
-2. Look up the provided `courseCode`.
-3. Return `JSON.stringify(course)` when found.
-4. Return a structured error when it is missing.
-5. Add `getCourseInfo` to the exported `tools` array.
+1. Import `searchDining` from [`data/dining.ts`](data/dining.ts).
+2. Call it with `query`.
+3. Return `JSON.stringify({ kind: "dining", query, matches })`.
+4. Add `findDining` to the exported `tools` array.
 
 Test:
 
 ```text
-What is CS112? How many credits is it?
+Find a meal-plan dining option on Busch.
 ```
 
-Before registration, the model can guess. After registration, the course card
-shows data produced by your code. That is the central chatbot-versus-agent
-lesson.
+This is harder than course lookup because the tool searches and can return
+several matches.
 
-## 5. Add another Rutgers tool
+## 4. Add buildings (nicknames and nearby places)
 
-Choose one template:
+Implement `findBuilding` using [`data/buildings.ts`](data/buildings.ts).
+Students say "Hill" or "CORE", not the official building name. Handle empty
+results instead of crashing.
 
-- `findDining` → [`data/dining.ts`](data/dining.ts)
-- `findBuilding` → [`data/buildings.ts`](data/buildings.ts)
-- `findEvents` → [`data/events.ts`](data/events.ts)
-- `calculateGrade` → convert letter grades to grade points
+Test:
+
+```text
+Where is Hill Center, and what's nearby?
+```
+
+## 5. Add events (filter by topic)
+
+Implement `findEvents` using [`data/events.ts`](data/events.ts). Filter by
+campus, organization, course, or topic.
+
+Test:
+
+```text
+Show me upcoming computer science events.
+```
+
+## 6. Add grades, then combine tools
+
+Implement `calculateGrade`: parse comma-separated letter grades, validate them,
+map to points, and return a GPA.
+
+Then ask one question that needs several tools:
+
+```text
+Tell me about CS112, find dining on its campus, and calculate my GPA for A, B+, B.
+```
+
+The activity panel should show multiple graph passes. Tool calls may run in
+parallel when the model requests them together.
 
 Keep the input schema flat and give every field a clear `.describe(...)`.
-Gemini uses that schema to create the arguments.
-
-Return a discriminated object with a `kind` field. The UI uses `kind` to select
-a result card:
+Gemini uses that schema to create the arguments. Return a `kind` field so the
+UI can pick a card:
 
 ```ts
 return JSON.stringify({
@@ -139,17 +165,6 @@ return JSON.stringify({
   matches,
 });
 ```
-
-## 6. Make the agent combine tools
-
-Register at least two Rutgers tools and ask one question that needs both:
-
-```text
-Tell me about CS112 and find a meal-plan dining option on its campus.
-```
-
-The activity panel should show multiple graph passes. Tool calls may run in
-parallel when the model requests them together.
 
 ## 7. Create your tool
 
@@ -161,7 +176,7 @@ Design one Rutgers-specific capability. Ideas:
 - recommend a club from interests;
 - calculate meal swipes remaining.
 
-Add mock data if needed, return structured JSON, register the tool, and update
+Add data if needed, return structured JSON, register the tool, and update
 [`agent/prompts.ts`](agent/prompts.ts) only if the agent needs extra guidance.
 
 ### Final challenge
@@ -179,9 +194,9 @@ A completed agent should call `getCourseInfo`, `calculateGrade`, and
 - Add a new result card in [`components`](components).
 - Make errors more helpful and test a failed lookup.
 - Add tool confirmation before a high-impact action.
-- Connect one tool to a real API while preserving the mock fallback.
+- Connect one tool to an external API.
 - Improve the system prompt.
-- Add persistent memory rather than process-local workshop memory.
+- Add persistent memory rather than process-local memory.
 
 ## Useful commands
 
@@ -202,10 +217,3 @@ git switch solution
 
 Return to your work with `git switch main`. Avoid switching with uncommitted
 changes; commit or stash your work first.
-
-## Data and privacy notes
-
-- Course, hours, locations, and events are workshop examples and may be stale.
-- Free-tier Gemini requests may be used by Google according to its current
-  terms; do not send private student data.
-- The in-memory checkpointer is for local teaching, not production storage.

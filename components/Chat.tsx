@@ -12,9 +12,9 @@ import { ResultCard } from "./ResultCard";
 import { ToolActivity } from "./ToolActivity";
 
 const examplePrompts = [
-  "What is 42 × 17?",
   "What is CS112 and where is it usually taught?",
   "Find a meal-plan dining option on Busch.",
+  "Where is Hill Center?",
   "Show me upcoming computer science events.",
 ];
 
@@ -22,7 +22,7 @@ const welcome: ChatMessage = {
   id: "welcome",
   role: "assistant",
   content:
-    "Hi! I’m your Rutgers Campus Assistant. I can use tools to calculate, look up courses, find dining, locate buildings, and discover events. Try one of the prompts below.",
+    "Hi! I’m your Rutgers Campus Assistant. I can look up courses — and I’ll get better as you add dining, buildings, events, and more. Try a prompt below.",
 };
 
 export function Chat() {
@@ -245,7 +245,7 @@ export function Chat() {
               </button>
             </form>
             <p className="mt-2 text-center text-[10px] text-[var(--muted)]">
-              Mock workshop data · Always verify live Rutgers information
+              Rutgers Campus Assistant
             </p>
           </div>
         </div>
