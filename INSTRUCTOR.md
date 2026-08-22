@@ -3,10 +3,13 @@
 This workshop teaches **tool calling through a Rutgers project**. LangGraph is
 the visible foundation, not the implementation assignment.
 
+Students start with a working `getCourseInfo` tool. Each later checkpoint adds
+a harder campus ability, so the agent gets more useful as they code.
+
 ## Before the room arrives
 
 - Use Node.js 20+ and run `npm install`, `npm run typecheck`, and `npm run build`.
-- Test `main` with a fresh Gemini AI Studio key.
+- Test `main` with a fresh Gemini AI Studio key: ask about CS112, then dining.
 - Test `solution` with the final multi-tool prompt.
 - Ask every student to create their own free key before the workshop. Gemini
   quotas apply per project, so one shared key can throttle the whole room.
@@ -17,30 +20,32 @@ the visible foundation, not the implementation assignment.
 
 | Time | Segment | Outcome |
 | --- | --- | --- |
-| 0–10 | Launch and calculator demo | Everyone sees a real tool call |
+| 0–10 | Launch and CS112 demo | Everyone sees a real campus tool call |
 | 10–20 | Trace `graph.ts` and the activity panel | Students understand Agent → Tool → Agent |
-| 20–30 | Modify calculator | First safe code change |
-| 30–50 | Build `getCourseInfo` | First structured Rutgers tool |
-| 50–65 | Build a second tool | Students practice independently |
-| 65–78 | Multi-tool prompt | The reason for an agent becomes clear |
-| 78–90 | Personal tool and demos | Students leave with a distinct project |
+| 20–40 | Build `findDining` | First student-written tool (search + list) |
+| 40–55 | Build `findBuilding` or `findEvents` | Slightly harder matching and filtering |
+| 55–72 | `calculateGrade` + multi-tool prompt | Logic, then combining abilities |
+| 72–90 | Personal tool and demos | Students leave with a distinct project |
 
-For 60 minutes, pre-pair students and skip the calculator modification. For two
-hours, reserve 25 minutes for personal tools and stretch goals.
+For 60 minutes, skip the personal tool and stop after the multi-tool prompt.
+For two hours, reserve 25 minutes for personal tools and stretch goals.
 
 ## Teaching script
 
 ### Opening
 
-Ask `What is 42 × 17?`, then point to these events:
+Ask `What is CS112 and where is it usually taught?`, then point to these events:
 
 1. request received;
 2. agent decides;
-3. `calculator` receives structured arguments;
+3. `getCourseInfo` receives `courseCode: "CS112"`;
 4. the result returns;
-5. the agent writes a human response.
+5. a course card appears, then the agent writes a human response.
 
 The distinction to repeat: **the model chose an action; our code performed it**.
+
+Then ask `Where can I eat on Busch?` The starter cannot look that up yet.
+That missing ability is the first thing students add.
 
 ### Graph walkthrough
 
@@ -49,16 +54,21 @@ Open only four files:
 - `state.ts`: the message history;
 - `nodes.ts`: model and tool execution;
 - `graph.ts`: edges and loop;
-- `tools.ts`: today's workspace.
+- `tools.ts`: today's workspace, starting with `getCourseInfo`.
 
 Do not begin with SSE, React state, or provider setup. Those are intentionally
 prebuilt infrastructure.
 
-### First reveal
+### Difficulty curve
 
-Let students ask `What is CS112?` before registering the course tool. A plausible
-answer is still an unsupported guess. After implementing the tool, the result
-card is evidence from deterministic data.
+Keep this order on the projector:
+
+1. `getCourseInfo` — one lookup, one object (given)
+2. `findDining` — search, return a list
+3. `findBuilding` — aliases like "Hill" and "CORE"
+4. `findEvents` — filter by topic or course
+5. `calculateGrade` — parse, validate, compute
+6. Combine tools, then invent a new one
 
 ### Solution reveal
 
@@ -116,9 +126,3 @@ only inside the current Node process.
 - Structured results render as cards.
 - The final answer combines results rather than repeating JSON.
 - One tool handles a missing result without crashing the graph.
-
-## Production boundaries
-
-This repo deliberately omits authentication, a durable checkpointer, live
-Rutgers data validation, abuse controls, and monitoring. Present those as real
-engineering concerns, not workshop TODOs.

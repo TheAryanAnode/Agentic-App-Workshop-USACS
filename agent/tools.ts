@@ -5,55 +5,13 @@ import { searchDining } from "@/data/dining";
 import { searchBuildings } from "@/data/buildings";
 import { searchEvents } from "@/data/events";
 
-// ---------------------------------------------------------------------------
-// WORKING EXAMPLE: every student starts with this tool.
-// ---------------------------------------------------------------------------
-
-export const calculator = tool(
-  async ({ firstNumber, secondNumber, operation }) => {
-    const operations = {
-      add: () => firstNumber + secondNumber,
-      subtract: () => firstNumber - secondNumber,
-      multiply: () => firstNumber * secondNumber,
-      divide: () => {
-        if (secondNumber === 0) throw new Error("Cannot divide by zero.");
-        return firstNumber / secondNumber;
-      },
-    };
-
-    const result = operations[operation]();
-    return JSON.stringify({
-      kind: "calculation",
-      expression: `${firstNumber} ${operation} ${secondNumber}`,
-      result,
-    });
-  },
-  {
-    name: "calculator",
-    description:
-      "Perform arithmetic on two numbers. Use this instead of calculating mentally.",
-    schema: z.object({
-      firstNumber: z.number().describe("The first number"),
-      secondNumber: z.number().describe("The second number"),
-      operation: z
-        .enum(["add", "subtract", "multiply", "divide"])
-        .describe("The arithmetic operation"),
-    }),
-  },
-);
-
-// ---------------------------------------------------------------------------
-// RUTGERS TOOLS: these are complete on the solution branch. On the starter
-// branch, students receive short TODO templates for the same capabilities.
-// ---------------------------------------------------------------------------
-
 export const getCourseInfo = tool(
   async ({ courseCode }) => {
     const course = findCourse(courseCode);
     return JSON.stringify(
       course ?? {
         kind: "error",
-        message: `No course matched "${courseCode}" in the workshop dataset.`,
+        message: `No course matched "${courseCode}".`,
       },
     );
   },
@@ -74,7 +32,6 @@ export const findDining = tool(
       kind: "dining",
       query,
       matches,
-      note: "Hours are mock workshop data and should be verified before visiting.",
     });
   },
   {
@@ -111,7 +68,6 @@ export const findEvents = tool(
       kind: "event",
       query,
       matches,
-      note: "Events are mock workshop examples, not a live calendar.",
     });
   },
   {
@@ -160,7 +116,7 @@ export const calculateGrade = tool(
       kind: "grade",
       grades: parsed,
       gpa: Number(gpa.toFixed(2)),
-      scale: "Rutgers workshop scale (unweighted courses)",
+      scale: "Unweighted letter-grade average",
     });
   },
   {
@@ -175,9 +131,7 @@ export const calculateGrade = tool(
   },
 );
 
-// Add a new tool here, then include it in this array so the agent can use it.
 export const tools = [
-  calculator,
   getCourseInfo,
   findDining,
   findBuilding,
