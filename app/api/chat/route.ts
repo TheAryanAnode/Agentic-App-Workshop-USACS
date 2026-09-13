@@ -3,6 +3,7 @@ import { graph } from "@/agent/graph";
 import {
   encodeEvent,
   friendlyError,
+  isUnknownToolError,
   messageToText,
   parseToolResult,
 } from "@/lib/stream";
@@ -72,7 +73,17 @@ export async function POST(request: Request) {
         },
       });
 
+      const needsCampusTool =
+        /\b(dining|eat|meal[- ]?plan|building|hill center|events?|gpa|grades?)\b/i.test(
+          message,
+        );
+      const unavailableMessage =
+        "I don't have a registered tool for that yet, so I can't look it up. Implement the tool in agent/tools.ts and add it to the tools array.";
+
       try {
+        let sawUnknownTool = false;
+        let sawSuccessfulResult = false;
+
         const updates = await graph.stream(
           { messages: [new HumanMessage(message.trim())] },
           {
@@ -109,7 +120,13 @@ export async function POST(request: Request) {
             } else {
               const content = messageToText(aiMessage as never);
               if (content) {
-                send({ type: "assistant", content });
+                const hideInventedAnswer =
+                  !sawSuccessfulResult &&
+                  (sawUnknownTool || needsCampusTool);
+                send({
+                  type: "assistant",
+                  content: hideInventedAnswer ? unavailableMessage : content,
+                });
                 send({
                   type: "activity",
                   activity: {
@@ -129,10 +146,30 @@ export async function POST(request: Request) {
 
             for (const toolMessage of messages ?? []) {
               const callId = toolMessage.tool_call_id ?? crypto.randomUUID();
+              const result = parseToolResult(toolMessage.content as never);
+
+              if (isUnknownToolError(result)) {
+                sawUnknownTool = true;
+                send({
+                  type: "activity",
+                  activity: {
+                    id: `tool-${callId}`,
+                    toolCallId: callId,
+                    label: `${toolMessage.name ?? "Tool"} is not registered`,
+                    status: "error",
+                  },
+                });
+                continue;
+              }
+
+              if (result.kind !== "error") {
+                sawSuccessfulResult = true;
+              }
+
               send({
                 type: "tool_result",
                 toolName: toolMessage.name,
-                result: parseToolResult(toolMessage.content as never),
+                result,
               });
               send({
                 type: "activity",

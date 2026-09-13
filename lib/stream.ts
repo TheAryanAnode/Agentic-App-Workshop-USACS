@@ -23,6 +23,12 @@ export function messageToText(message: BaseMessage) {
     .join("");
 }
 
+export function isUnknownToolError(result: ToolResult) {
+  return (
+    result.kind === "error" && /tool .+ not found/i.test(result.message)
+  );
+}
+
 export function parseToolResult(content: BaseMessage["content"]) {
   const text =
     typeof content === "string"
