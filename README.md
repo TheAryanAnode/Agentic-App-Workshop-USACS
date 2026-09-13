@@ -209,6 +209,11 @@ npm run build      # verify a production build
 
 ## Need the completed version?
 
-The finished campus tools are on `main` in [`agent/tools.ts`](agent/tools.ts).
-The original student starter with TODO stubs is still available from git history
-if you need to reset a checkpoint.
+The student starter is on `main`. Instructors can reveal the finished tools:
+
+```bash
+git switch solution
+```
+
+Return to your work with `git switch main`. Avoid switching with uncommitted
+changes; commit or stash your work first.
