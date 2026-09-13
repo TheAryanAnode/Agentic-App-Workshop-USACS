@@ -90,7 +90,7 @@ projected solution or show a diff instead.
 
 ## Gemini notes
 
-- The default is `gemini-2.5-flash` through `@langchain/google`.
+- The default is `gemini-3.6-flash` through `@langchain/google`.
 - `GOOGLE_API_KEY` and `GEMINI_API_KEY` are both accepted by `lib/model.ts`.
 - Tool schemas are deliberately flat. Avoid nested unions during the workshop.
 - A single user request may make several model requests because each tool result

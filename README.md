@@ -36,7 +36,6 @@ You need Node.js 20 or newer and a free Gemini API key.
 2. Install and configure the app:
 
    ```bash
-   npm install
    cp .env.example .env.local
    ```
 
@@ -49,7 +48,7 @@ You need Node.js 20 or newer and a free Gemini API key.
 4. Start the app:
 
    ```bash
-   npm run dev
+   ./run.sh
    ```
 
 5. Open [http://localhost:3000](http://localhost:3000) and ask:
@@ -201,7 +200,8 @@ A completed agent should call `getCourseInfo`, `calculateGrade`, and
 ## Useful commands
 
 ```bash
-npm run dev        # start the workshop app
+./run.sh          # install deps if needed and start the app
+./run.sh --bypass  # start even without an API key
 npm run typecheck  # check TypeScript
 npm run lint       # run ESLint
 npm run build      # verify a production build
@@ -209,11 +209,6 @@ npm run build      # verify a production build
 
 ## Need the completed version?
 
-The student starter is on `main`. Instructors can reveal the finished tools:
-
-```bash
-git switch solution
-```
-
-Return to your work with `git switch main`. Avoid switching with uncommitted
-changes; commit or stash your work first.
+The finished campus tools are on `main` in [`agent/tools.ts`](agent/tools.ts).
+The original student starter with TODO stubs is still available from git history
+if you need to reset a checkpoint.

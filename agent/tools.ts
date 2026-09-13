@@ -1,11 +1,9 @@
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
 import { findCourse } from "@/data/courses";
-
-// ---------------------------------------------------------------------------
-// WORKING EXAMPLE — already registered. Copy this pattern for later tools.
-// One lookup, one result. This is the easiest kind of campus tool.
-// ---------------------------------------------------------------------------
+import { searchDining } from "@/data/dining";
+import { searchBuildings } from "@/data/buildings";
+import { searchEvents } from "@/data/events";
 
 export const getCourseInfo = tool(
   async ({ courseCode }) => {
@@ -27,20 +25,13 @@ export const getCourseInfo = tool(
   },
 );
 
-// ---------------------------------------------------------------------------
-// Add abilities below. Each one is a little harder than the last.
-// Remember: implement the function, then add it to `tools` at the bottom.
-// ---------------------------------------------------------------------------
-
-// Checkpoint 3 — search and return a list
 export const findDining = tool(
   async ({ query }) => {
-    // TODO: import searchDining from "@/data/dining"
-    // Call it with query and return:
-    // JSON.stringify({ kind: "dining", query, matches })
+    const matches = searchDining(query);
     return JSON.stringify({
-      kind: "error",
-      message: `TODO: implement findDining for "${query}".`,
+      kind: "dining",
+      query,
+      matches,
     });
   },
   {
@@ -55,15 +46,10 @@ export const findDining = tool(
   },
 );
 
-// Checkpoint 4 — match nicknames like "Hill" or "CORE"
 export const findBuilding = tool(
   async ({ query }) => {
-    // TODO: import searchBuildings from "@/data/buildings"
-    // Return { kind: "building", query, matches }
-    return JSON.stringify({
-      kind: "error",
-      message: `TODO: implement findBuilding for "${query}".`,
-    });
+    const matches = searchBuildings(query);
+    return JSON.stringify({ kind: "building", query, matches });
   },
   {
     name: "findBuilding",
@@ -75,14 +61,13 @@ export const findBuilding = tool(
   },
 );
 
-// Checkpoint 5 — filter by topic, campus, org, or course
 export const findEvents = tool(
   async ({ query }) => {
-    // TODO: import searchEvents from "@/data/events"
-    // Return { kind: "event", query, matches }
+    const matches = searchEvents(query);
     return JSON.stringify({
-      kind: "error",
-      message: `TODO: implement findEvents for "${query}".`,
+      kind: "event",
+      query,
+      matches,
     });
   },
   {
@@ -95,15 +80,43 @@ export const findEvents = tool(
   },
 );
 
-// Checkpoint 6 — parse input, validate, and compute
+const gradePoints: Record<string, number> = {
+  A: 4,
+  B: 3,
+  "B+": 3.5,
+  C: 2,
+  "C+": 2.5,
+  D: 1,
+  F: 0,
+};
+
 export const calculateGrade = tool(
   async ({ grades }) => {
-    // TODO: split the comma-separated grades, map letter grades to points
-    // (A=4, B+=3.5, B=3, C+=2.5, C=2, D=1, F=0), then return the average.
-    // Return { kind: "grade", grades, gpa, scale }
+    const parsed = grades
+      .split(",")
+      .map((grade) => grade.trim().toUpperCase())
+      .filter(Boolean);
+    const invalid = parsed.filter((grade) => gradePoints[grade] === undefined);
+
+    if (parsed.length === 0 || invalid.length > 0) {
+      return JSON.stringify({
+        kind: "error",
+        message:
+          invalid.length > 0
+            ? `Unsupported grade(s): ${invalid.join(", ")}`
+            : "Provide at least one letter grade.",
+      });
+    }
+
+    const gpa =
+      parsed.reduce((total, grade) => total + gradePoints[grade], 0) /
+      parsed.length;
+
     return JSON.stringify({
-      kind: "error",
-      message: `TODO: implement calculateGrade for "${grades}".`,
+      kind: "grade",
+      grades: parsed,
+      gpa: Number(gpa.toFixed(2)),
+      scale: "Unweighted letter-grade average",
     });
   },
   {
@@ -118,12 +131,10 @@ export const calculateGrade = tool(
   },
 );
 
-// Register a tool here after you implement it, or the agent cannot call it.
-export const tools = [getCourseInfo];
-
-// YOUR TOOL:
-// Combine ideas, add a new dataset, or solve a request the current tools cannot.
-// 1. Define it with tool(...)
-// 2. Give it a clear description and a flat Zod schema
-// 3. Return JSON with a predictable `kind`
-// 4. Register it in the array above
+export const tools = [
+  getCourseInfo,
+  findDining,
+  findBuilding,
+  findEvents,
+  calculateGrade,
+];
