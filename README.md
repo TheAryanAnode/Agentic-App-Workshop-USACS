@@ -36,7 +36,6 @@ You need Node.js 20 or newer and a free Gemini API key.
 2. Install and configure the app:
 
    ```bash
-   npm install
    cp .env.example .env.local
    ```
 
@@ -49,7 +48,7 @@ You need Node.js 20 or newer and a free Gemini API key.
 4. Start the app:
 
    ```bash
-   npm run dev
+   ./run.sh
    ```
 
 5. Open [http://localhost:3000](http://localhost:3000) and ask:
@@ -201,7 +200,8 @@ A completed agent should call `getCourseInfo`, `calculateGrade`, and
 ## Useful commands
 
 ```bash
-npm run dev        # start the workshop app
+./run.sh          # install deps if needed and start the app
+./run.sh --bypass  # start even without an API key
 npm run typecheck  # check TypeScript
 npm run lint       # run ESLint
 npm run build      # verify a production build

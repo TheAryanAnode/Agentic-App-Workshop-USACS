@@ -12,7 +12,7 @@ export function getModel() {
   if (googleApiKey) {
     return new ChatGoogle({
       apiKey: googleApiKey,
-      model: process.env.GEMINI_MODEL ?? "gemini-2.5-flash",
+      model: process.env.GEMINI_MODEL ?? "gemini-3.6-flash",
       maxRetries: 2,
     });
   }
