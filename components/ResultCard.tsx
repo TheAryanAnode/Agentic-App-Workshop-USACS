@@ -62,6 +62,10 @@ export function ResultCard({ result }: { result: ToolResult }) {
     );
   }
 
+  if (/tool .+ not found/i.test(result.message)) {
+    return null;
+  }
+
   return (
     <div className="rounded-2xl border border-red-800/15 bg-red-50 p-4 text-sm text-red-900">
       <span className="font-bold">Tool response:</span> {result.message}

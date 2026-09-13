@@ -13,8 +13,11 @@ import { tools } from "./tools";
  */
 export async function agentNode(state: AgentStateType) {
   const modelWithTools = getModel().bindTools(tools);
+  const registered = tools.map((tool) => tool.name).join(", ");
   const response = await modelWithTools.invoke([
-    new SystemMessage(SYSTEM_PROMPT),
+    new SystemMessage(
+      `${SYSTEM_PROMPT}\n\nRegistered tools: ${registered}. Only call these names.`,
+    ),
     ...state.messages,
   ]);
 
